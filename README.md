@@ -5,6 +5,7 @@ Web utility for keyboard-friendly entry and controlled editing of petty-cash vou
 Project references:
 
 - [Project requirements](docs/PROJECT_REQUIREMENTS.md)
+- [Fresh-machine installation](docs/INSTALL.md)
 - [Code walkthrough](docs/CODE_WALKTHROUGH.md)
 - [Contributor and agent guide](AGENTS.md)
 - [Grist access rules](PettyCashVouchers-access-rules.md)
