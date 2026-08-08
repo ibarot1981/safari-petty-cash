@@ -13,3 +13,6 @@ Thumbs.db
 # Runtime files created by StartServer.bat
 runtime/*
 !runtime/.gitkeep
+
+# Temporary development fallback; never distribute without authentication.
+poc-voucher-entry-no-auth*/
