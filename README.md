@@ -1,4 +1,15 @@
-# Petty Cash Voucher Entry Web Utility
+# Safari Petty Cash
+
+Web utility for keyboard-friendly entry and controlled editing of petty-cash vouchers in Grist.
+
+Project references:
+
+- [Project requirements](docs/PROJECT_REQUIREMENTS.md)
+- [Code walkthrough](docs/CODE_WALKTHROUGH.md)
+- [Contributor and agent guide](AGENTS.md)
+- [Grist access rules](PettyCashVouchers-access-rules.md)
+
+## Petty Cash Voucher Entry Web Utility
 
 Small web entry utility for the live Grist petty cash model.
 
@@ -59,7 +70,7 @@ Dry-run mode is controlled at server startup with `DRY_RUN=true`. When enabled, 
 
 The main Web UI uses Authentik OAuth2/OIDC. Users are not created separately in this app; the app trusts the same Authentik identity used for Grist.
 
-For local testing, create `poc-voucher-entry/.env` using `poc-voucher-entry/.env.example` as the shape:
+For local testing, create `.env` using `.env.example` as the shape:
 
 ```text
 OIDC_ISSUER_URL=http://safcost.duckdns.org/application/o/petty-cash-web/
@@ -74,12 +85,6 @@ While running over HTTP, cookies are `HttpOnly` and `SameSite=Lax`, but not `Sec
 
 ```text
 COOKIE_SECURE=true
-```
-
-A no-auth fallback copy was created separately at:
-
-```text
-C:\Users\ibaro\Documents\Codex\2026-07-08\can\poc-voucher-entry-no-auth-20260801-125102
 ```
 
 To validate a sample web voucher payload without writing to Grist:
