@@ -50,7 +50,9 @@ Before saving, the web utility checks for possible duplicates using voucher date
 4. Open `http://localhost:5177`.
 5. Double-click `StopServer.bat` when you want to stop the local server.
 
-The start script records only its own server process in `runtime/server.pid`, and writes diagnostics to `runtime/server.log` and `runtime/server-error.log`.
+Before each new server start, the script checks GitHub's `main` branch and applies a fast-forward update. This requires Git, network access, GitHub authentication, a clean local `main` checkout, and no locally-ahead commits. If any of those checks fail, the script stops rather than running an unverified version.
+
+The start script records only its own server process in `runtime/server.pid`, and writes diagnostics to `runtime/server.log` and `runtime/server-error.log`. Stop a running server before launching it again to apply an update.
 
 ## Web Utility
 

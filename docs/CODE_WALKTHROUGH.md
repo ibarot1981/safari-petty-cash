@@ -18,14 +18,15 @@ Update this document in the same pull request whenever a code path, UI workflow,
 
 ## Runtime sequence
 
-1. `StartServer.bat` starts `node server.mjs` in the background and records the process ID in `runtime/server.pid`.
-2. `server.mjs` loads `.env`, reads the port (default `5177`), builds OIDC settings, and starts the HTTP server.
-3. A browser requests `/`. Unauthenticated requests are redirected to `/login`; static assets are served only after authentication.
-4. `/login` obtains OIDC discovery metadata, creates a state/nonce/PKCE verifier, and redirects to Authentik.
-5. `/auth/callback` exchanges the authorization code, validates identity-token claims, and creates an HttpOnly signed session cookie.
-6. `public/app.js` loads `/api/me`, `/api/health`, and reference data. It shows the entry form only while Grist is reachable.
-7. On save or update, the browser validates the entry and posts a complete voucher payload to the server.
-8. The server calls `gristClient.mjs`, which validates against current Grist records immediately before writing headers, lines, participants, and allocations.
+1. `StartServer.bat` first detects whether its server is already running. Before every new start, it verifies that the checkout is clean, on `main`, and not ahead of GitHub. It fetches `origin/main` and applies any fast-forward update before starting the server.
+2. `StartServer.bat` starts `node server.mjs` in the background and records the process ID in `runtime/server.pid`.
+3. `server.mjs` loads `.env`, reads the port (default `5177`), builds OIDC settings, and starts the HTTP server.
+4. A browser requests `/`. Unauthenticated requests are redirected to `/login`; static assets are served only after authentication.
+5. `/login` obtains OIDC discovery metadata, creates a state/nonce/PKCE verifier, and redirects to Authentik.
+6. `/auth/callback` exchanges the authorization code, validates identity-token claims, and creates an HttpOnly signed session cookie.
+7. `public/app.js` loads `/api/me`, `/api/health`, and reference data. It shows the entry form only while Grist is reachable.
+8. On save or update, the browser validates the entry and posts a complete voucher payload to the server.
+9. The server calls `gristClient.mjs`, which validates against current Grist records immediately before writing headers, lines, participants, and allocations.
 
 ## Browser application: `public/app.js`
 
