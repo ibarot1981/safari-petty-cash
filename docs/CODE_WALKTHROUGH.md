@@ -14,6 +14,7 @@ Update this document in the same pull request whenever a code path, UI workflow,
 | `scripts/save-sample-web.mjs` | Developer sample payload for exercising the save path, preferably with `DRY_RUN=true`. |
 | `StartServer.bat` / `StopServer.bat` | Double-click Windows server lifecycle helpers; runtime state is stored in `runtime/`. |
 | `.env.example` | Safe configuration template. The actual `.env` must remain local. |
+| `docs/INSTALL.md` | Detailed fresh-Windows-machine installation, configuration, verification, update, and troubleshooting guide. |
 | `PettyCashVouchers-access-rules.md` | Human-readable Grist role and ACL reference. |
 
 ## Runtime sequence
