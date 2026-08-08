@@ -1,0 +1,63 @@
+@font-face {
+  font-display: swap;
+  font-family: "Exo";
+  font-style: normal;
+  font-weight: 600;
+  src: url("/assets/fonts/exo-600.ttf") format("truetype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Exo";
+  font-style: normal;
+  font-weight: 700;
+  src: url("/assets/fonts/exo-700.ttf") format("truetype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Exo";
+  font-style: normal;
+  font-weight: 800;
+  src: url("/assets/fonts/exo-800.ttf") format("truetype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Public Sans";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/assets/fonts/public-sans-400.ttf") format("truetype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Public Sans";
+  font-style: normal;
+  font-weight: 500;
+  src: url("/assets/fonts/public-sans-500.ttf") format("truetype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Public Sans";
+  font-style: normal;
+  font-weight: 600;
+  src: url("/assets/fonts/public-sans-600.ttf") format("truetype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Public Sans";
+  font-style: normal;
+  font-weight: 700;
+  src: url("/assets/fonts/public-sans-700.ttf") format("truetype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Public Sans";
+  font-style: normal;
+  font-weight: 800;
+  src: url("/assets/fonts/public-sans-800.ttf") format("truetype");
+}

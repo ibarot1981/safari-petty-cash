@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Petty Cash Voucher Entry</title>
+    <link rel="stylesheet" href="/assets/fonts/fonts.css">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="toolbar">
+        <div class="brand-block">
+          <img class="brand-logo" src="/assets/safari-logo.png" alt="Safari">
+          <div>
+            <h1>Petty Cash Entry</h1>
+            <p>Writes to live petty-cash tables</p>
+            <p class="shortcut-help">Shortcuts: Ctrl+F2 Save, Ctrl+F3 Cancel, Ctrl+Enter Add Line, Ctrl+F8 Save Template, Ctrl+F6 Use Template, Ctrl+F7 Refresh Recent</p>
+          </div>
+        </div>
+        <div class="header-tools">
+          <div id="gristStatus" class="grist-status grist-status-checking">
+            <span class="status-dot"></span>
+            <span id="gristStatusText">Checking Grist...</span>
+          </div>
+          <div id="userBadge" class="user-badge">Signed in</div>
+          <a class="logout-link" href="/logout">Logout</a>
+        </div>
+      </section>
+
+      <div id="gristUnavailablePanel" class="panel unavailable-panel hidden">
+        <div class="panel-title">Grist Not Available</div>
+        <p id="gristUnavailableMessage">The voucher entry form is paused because Grist is not reachable.</p>
+        <button id="retryGristHealth" type="button">Retry Grist Check</button>
+      </div>
+
+      <form id="voucherForm" class="hidden" autocomplete="off">
+        <div id="dryRunBanner" class="dry-run-banner hidden">Server dry-run mode is enabled. Saves will validate only and will not write to Grist.</div>
+        <div class="entry-tabs" role="tablist" aria-label="Voucher entry mode">
+          <button id="newVoucherTab" class="tab-button active" type="button" role="tab" aria-selected="true">New Voucher</button>
+          <button id="editVoucherTab" class="tab-button" type="button" role="tab" aria-selected="false">Edit Voucher</button>
+        </div>
+
+        <section id="editSearchPanel" class="panel edit-search-panel hidden">
+          <div class="panel-title">Find Voucher To Edit</div>
+          <div class="edit-search-grid">
+            <label>
+              Voucher No.
+              <input id="editSearchVoucherNo" type="text" placeholder="e.g. 26-AUG-0004">
+            </label>
+            <label>
+              Date
+              <input id="editSearchDate" type="date">
+            </label>
+            <label>
+              Month
+              <input id="editSearchMonth" type="month">
+            </label>
+            <label>
+              Paid To / Received From
+              <input id="editSearchPartyText" list="partyList">
+            </label>
+            <div class="edit-search-actions">
+              <button id="searchVouchers" type="button">Search</button>
+              <button id="clearVoucherSearch" class="secondary" type="button">Clear</button>
+            </div>
+          </div>
+          <div class="edit-note">Only unsigned and not-closed vouchers can be edited. Signed or closure-locked vouchers are shown as view-only.</div>
+          <div id="editSearchResults" class="edit-results" aria-live="polite"></div>
+        </section>
+
+        <div id="entryModeBanner" class="mode-banner hidden"></div>
+        <div id="entrySections">
+        <section class="panel">
+          <div class="panel-title">Header</div>
+          <div class="header-layout">
+            <div class="header-main">
+              <details class="template-drawer">
+                <summary>Use Saved Template <span class="shortcut-key">Ctrl+F6</span></summary>
+                <div class="template-row">
+                  <label>
+                    Template
+                    <input id="templateText" list="templateList" placeholder="Choose saved template">
+                    <datalist id="templateList"></datalist>
+                  </label>
+                  <button id="applyTemplate" type="button">Use Template <span class="shortcut-key">Ctrl+F6</span></button>
+                </div>
+              </details>
+              <div class="grid">
+                <label>
+                  Type
+                  <select id="voucherType" name="voucherType">
+                    <option>Expense</option>
+                    <option>Receipt</option>
+                  </select>
+                </label>
+                <label>
+                  Date
+                  <input id="voucherDate" name="voucherDate" type="date" required>
+                </label>
+                <label>
+                  Voucher Purpose
+                  <input id="voucherPurposeText" list="purposeList" required>
+                  <datalist id="purposeList"></datalist>
+                </label>
+                <label>
+                  <span id="partyFieldLabel">Paid To</span>
+                  <input id="paidToPartyText" list="partyList" required>
+                  <datalist id="partyList"></datalist>
+                </label>
+                <label>
+                  Location
+                  <input id="locationText" list="locationList" required>
+                  <datalist id="locationList"></datalist>
+                </label>
+                <label id="receiptAmountWrap" class="hidden">
+                  Receipt Amount
+                  <input id="receiptAmount" type="number" min="0.01" step="0.01" inputmode="decimal">
+                </label>
+                <label class="wide">
+                  Purpose / Description
+                  <input id="purpose" type="text" list="purposeDescriptionList" placeholder="Brief reason for voucher" maxlength="500" required>
+                  <datalist id="purposeDescriptionList"></datalist>
+                </label>
+              </div>
+              <details id="partyHistoryPanel" class="party-history hidden">
+                <summary id="partyHistorySummary">Past vouchers for selected party</summary>
+                <div id="partyHistoryList" class="party-history-list" aria-live="polite"></div>
+              </details>
+              <div id="newPartyPanel" class="new-party hidden">
+                <div id="newPartyNote" class="panel-note">Paid To is not in the master list. Add it once here, then it will be available next time.</div>
+                <label>
+                  New Party Type
+                  <select id="newPartyType">
+                    <option>Other Person</option>
+                    <option>Vendor</option>
+                    <option>Transporter</option>
+                    <option>Shop</option>
+                    <option>Employee</option>
+                    <option>Bank</option>
+                    <option>Customer</option>
+                    <option>Other Organization</option>
+                  </select>
+                </label>
+                <label>
+                  Party Location
+                  <input id="newPartyLocationText" list="locationList">
+                </label>
+              </div>
+            </div>
+
+            <aside class="recent-panel header-recent">
+              <div class="panel-title row-title recent-title">
+                <span>Recent Entries</span>
+                <button id="refreshRecent" class="secondary small-button" type="button" tabindex="-1">Refresh <span class="shortcut-key">Ctrl+F7</span></button>
+              </div>
+              <div class="recent-note">Last 15 vouchers to help avoid duplicate entry.</div>
+              <div id="recentVouchers" class="recent-list" aria-live="polite"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="lineSection" class="panel">
+          <div class="panel-title">Lines</div>
+          <div class="entered-lines">
+            <div class="subsection-title">Entered Lines</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Expense Head</th>
+                  <th class="amount">Amount</th>
+                  <th>Split</th>
+                  <th>Target</th>
+                  <th>Description</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="lineRows"></tbody>
+            </table>
+          </div>
+
+          <div class="line-editor">
+            <div class="subsection-title">Add / Edit Next Line</div>
+            <div class="line-main">
+              <label>
+                Expense Head
+                <input id="lineExpenseHeadText" list="expenseHeadList">
+                <datalist id="expenseHeadList"></datalist>
+              </label>
+              <label>
+                Amount
+                <input id="lineAmount" type="number" min="0.01" step="0.01" inputmode="decimal">
+              </label>
+              <label>
+                Split
+                <select id="lineSplit">
+                  <option>Single Person</option>
+                  <option value="Participants Equal">Multiple Persons</option>
+                  <option>Head Only</option>
+                </select>
+              </label>
+              <label class="line-description">
+                Description
+                <input id="lineDescription" type="text">
+              </label>
+              <div class="line-action">
+                <button id="addLine" type="button">Add Line <span class="shortcut-key">Ctrl+Enter</span></button>
+              </div>
+            </div>
+
+            <div class="line-target">
+              <label id="singlePartyWrap">
+                Person
+                <input id="lineSinglePartyText" list="partyList">
+              </label>
+              <div id="multiPartyWrap" class="multi-party hidden">
+                <div class="multi-party-picker">
+                  <label>
+                    Add Employee
+                    <input id="lineMultiPartyText" list="employeePartyList">
+                    <datalist id="employeePartyList"></datalist>
+                  </label>
+                  <button id="addMultiParty" type="button">Add Employee</button>
+                </div>
+                <div id="selectedMultiParties" class="selected-parties"></div>
+              </div>
+              <label id="headWrap" class="hidden">
+                Head
+                <input id="lineHeadText" list="headList">
+                <datalist id="headList"></datalist>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">Review</div>
+          <dl class="review">
+            <div><dt>Voucher No.</dt><dd id="reviewVoucherNo">Generated on save</dd></div>
+            <div><dt>Type</dt><dd id="reviewType"></dd></div>
+            <div><dt>Total</dt><dd id="reviewTotal">0.00</dd></div>
+            <div><dt>Lines</dt><dd id="reviewLines">0</dd></div>
+          </dl>
+          <pre id="message" aria-live="polite"></pre>
+          <div class="actions">
+            <button id="saveVoucher" type="submit">Save Voucher <span class="shortcut-key">Ctrl+F2</span></button>
+            <button id="saveTemplate" type="button">Save As Template <span class="shortcut-key">Ctrl+F8</span></button>
+            <button id="cancelVoucher" type="button">Cancel <span class="shortcut-key">Ctrl+F3</span></button>
+          </div>
+        </section>
+        </div>
+      </form>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
