@@ -17,6 +17,7 @@ At the beginning of every new chat or task:
 3. If `main` is dirty, behind, ahead, or diverged, stop and explain the condition before editing anything.
 4. Create a new descriptive branch from the verified `main` branch.
 5. Keep the pull request focused on one purpose and include validation evidence in its description.
+6. When creating a pull request, provide a ready-to-paste PR description. It must state what changed, why it changed, user or operational impact, validation performed, and any remaining risks, assumptions, or follow-up work.
 
 Suggested branch names: `fix/...`, `feature/...`, `docs/...`, or `chore/...`.
 
