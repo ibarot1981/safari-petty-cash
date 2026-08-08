@@ -1,0 +1,38 @@
+name: Validate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    name: JavaScript syntax
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check server syntax
+        run: node --check server.mjs
+
+      - name: Check Grist client syntax
+        run: node --check gristClient.mjs
+
+      - name: Check browser syntax
+        run: node --check public/app.js
+
+      - name: Check sample script syntax
+        run: node --check scripts/save-sample-web.mjs
