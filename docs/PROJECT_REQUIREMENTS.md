@@ -49,3 +49,5 @@ Safari Petty Cash is a keyboard-friendly web utility for recording petty-cash re
 ## Reporting and review context
 
 Grist remains responsible for closure, signing review, detailed voucher review, and reports such as who spent how much, at which location, for which purpose, and under which Expense Head. Supporting page and access-rule design is recorded in `PettyCashVouchers-access-rules.md` and the Grist document itself.
+
+The Grist `Receipt Vouchers` page provides a receipt-only register through a voucher-type selector. Its receipt register includes the `Signed` status and opens linked voucher lines for the selected receipt.
