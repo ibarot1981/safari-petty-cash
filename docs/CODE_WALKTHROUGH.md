@@ -17,6 +17,10 @@ Update this document in the same pull request whenever a code path, UI workflow,
 | `docs/INSTALL.md` | Detailed fresh-Windows-machine installation, configuration, verification, update, and troubleshooting guide. |
 | `PettyCashVouchers-access-rules.md` | Human-readable Grist role and ACL reference. |
 
+## Grist review pages
+
+The live Grist document contains operational review pages alongside the web utility. `Receipt Vouchers` uses `PettyCashVouchers_summary_Voucher_Type` as a voucher-type selector. Selecting `Receipt` filters the linked `PettyCashVouchers` register to receipt headers, including the `Signed` column; selecting a header filters the linked `VoucherLines` grid. This view does not write or transform voucher data.
+
 ## Runtime sequence
 
 1. `StartServer.bat` first detects whether its server is already running. Before every new start, it verifies that the checkout is clean, on `main`, and not ahead of GitHub. It fetches `origin/main` and applies any fast-forward update before starting the server.
