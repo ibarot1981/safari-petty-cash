@@ -19,7 +19,7 @@ Update this document in the same pull request whenever a code path, UI workflow,
 
 ## Grist review pages
 
-The live Grist document contains operational review pages alongside the web utility. `Receipt Vouchers` uses `PettyCashVouchers_summary_Voucher_Type` as a voucher-type selector. Selecting `Receipt` filters the linked `PettyCashVouchers` register to receipt headers, including the `Signed` column; selecting a header filters the linked `VoucherLines` grid. This view does not write or transform voucher data.
+The live Grist document contains operational review pages alongside the web utility. `Receipt Vouchers` is permanently filtered to `PettyCashVouchers.Is_Current_Period_Receipt`, a formula that is true only when the voucher is a receipt and has no later locked cash closure. This means the register shows receipts dated after the latest locked closure, or all receipts when there is no locked closure. The header register visibly includes `Signed`; selecting a header filters the linked `VoucherLines` grid. This view does not write or transform voucher data.
 
 ## Runtime sequence
 
