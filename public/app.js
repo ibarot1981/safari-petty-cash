@@ -17,6 +17,7 @@ const state = {
   mode: "new",
   editingVoucherId: 0,
   editingVoucherNo: "",
+  cashPosition: null,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -688,6 +689,58 @@ function formatAmount(value) {
   });
 }
 
+function formatCashPositionDate(value) {
+  if (!value) return "no prior closure";
+  const [year, month, day] = String(value).split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" });
+}
+
+function formatCashPositionTimestamp(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "the last successful refresh";
+  return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+}
+
+function renderCashPosition(position) {
+  state.cashPosition = position;
+  const card = $("cashPositionCard");
+  card.classList.remove("cash-position-loading", "cash-position-stale");
+  $("cashPositionAmount").textContent = `₹${formatAmount(position.cashAtHand)}`;
+  $("cashPositionContext").textContent = `As of ${formatCashPositionDate(position.asOfDate)} · Last close ${formatCashPositionDate(position.latestCloseDate)} · Includes signed and unsigned saved vouchers`;
+  $("cashPositionOpening").textContent = `₹${formatAmount(position.openingCash)}`;
+  $("cashPositionReceipts").textContent = `₹${formatAmount(position.receiptTotal)}`;
+  $("cashPositionExpenses").textContent = `₹${formatAmount(position.expenseTotal)}`;
+  $("cashPositionVoucherCount").textContent = `${position.voucherCount} (${position.signedCount} signed, ${position.unsignedCount} unsigned)`;
+}
+
+function markCashPositionStale(message) {
+  const card = $("cashPositionCard");
+  card.classList.remove("cash-position-loading");
+  card.classList.add("cash-position-stale");
+  if (!state.cashPosition) {
+    $("cashPositionAmount").textContent = "Unavailable";
+  }
+  $("cashPositionContext").textContent = state.cashPosition
+    ? `Last updated ${formatCashPositionTimestamp(state.cashPosition.calculatedAt)}; this value may be stale. ${message}`
+    : `Cash at hand is unavailable. ${message}`;
+}
+
+async function refreshCashPosition() {
+  try {
+    const response = await fetch("/api/cash-position");
+    const position = await response.json();
+    if (!response.ok) throw new Error(position.error || "Could not calculate cash at hand.");
+    renderCashPosition(position);
+  } catch (error) {
+    markCashPositionStale(error.message);
+  }
+}
+
+async function refreshDashboard() {
+  await Promise.all([refreshRecentVouchers(), refreshCashPosition()]);
+}
+
 function splitMethodLabel(splitMethod) {
   return splitMethod === "Participants Equal" ? "Multiple Persons" : splitMethod;
 }
@@ -1105,10 +1158,11 @@ async function saveVoucher(event) {
     if (result.dryRun) {
       $("message").textContent = "Dry-run validation passed. No voucher was written to Grist.";
     } else if (isEdit) {
-      await refreshRecentVouchers();
+      await refreshDashboard();
       await searchEditableVouchers();
       closeEditedVoucher(`Updated ${result.voucherNo}. The voucher is closed from edit mode.`);
     } else {
+      await refreshDashboard();
       $("message").textContent = `Saved ${result.voucherNo}. Preparing a new entry...`;
       window.setTimeout(() => window.location.reload(), 900);
     }
@@ -1276,7 +1330,7 @@ function handleKeyboardShortcuts(event) {
     F2: () => $("voucherForm").requestSubmit(),
     F3: confirmAndResetForm,
     F6: applyTemplate,
-    F7: refreshRecentVouchers,
+    F7: refreshDashboard,
     F8: saveAsTemplate,
   };
 
@@ -1495,7 +1549,7 @@ async function init() {
     if (await checkGristHealth({ showChecking: true })) {
       await refreshReferenceData();
       setDefaultLocation();
-      await refreshRecentVouchers();
+      await refreshDashboard();
     }
   });
   window.setInterval(() => checkGristHealth(), 30000);
@@ -1504,7 +1558,7 @@ async function init() {
   await refreshReferenceData();
   setupComboboxes();
   refreshAllComboboxes();
-  await refreshRecentVouchers();
+  await refreshDashboard();
   setEntryMode("new");
 
   $("voucherDate").value = today();
@@ -1559,7 +1613,10 @@ async function init() {
     if (!button) return;
     loadVoucherForEdit(button.dataset.voucherId);
   });
-  $("refreshRecent").addEventListener("click", refreshRecentVouchers);
+  $("refreshRecent").addEventListener("click", refreshDashboard);
+  $("refreshCashPosition").addEventListener("click", refreshCashPosition);
+  window.addEventListener("focus", refreshCashPosition);
+  window.setInterval(refreshCashPosition, 60000);
   $("applyTemplate").addEventListener("click", applyTemplate);
   $("saveTemplate").addEventListener("click", saveAsTemplate);
   $("cancelVoucher").addEventListener("click", confirmAndResetForm);

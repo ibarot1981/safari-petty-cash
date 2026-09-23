@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { addParty, findDuplicateVouchers, getPartyVouchers, getRecentVouchers, getReferenceData, getVoucherForEdit, saveTemplate, saveVoucher, searchVouchers, updateVoucher } from "./gristClient.mjs";
+import { addParty, findDuplicateVouchers, getCashPosition, getPartyVouchers, getRecentVouchers, getReferenceData, getVoucherForEdit, saveTemplate, saveVoucher, searchVouchers, updateVoucher } from "./gristClient.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "public");
@@ -353,6 +353,11 @@ const server = http.createServer(async (request, response) => {
     if (request.method === "GET" && request.url.startsWith("/api/recent-vouchers")) {
       const url = new URL(request.url, `http://${request.headers.host}`);
       sendJson(response, 200, await getRecentVouchers(Number(url.searchParams.get("limit") || 15)));
+      return;
+    }
+
+    if (request.method === "GET" && pathname === "/api/cash-position") {
+      sendJson(response, 200, await getCashPosition());
       return;
     }
 

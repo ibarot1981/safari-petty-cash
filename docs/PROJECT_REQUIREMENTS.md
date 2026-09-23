@@ -37,6 +37,8 @@ Safari Petty Cash is a keyboard-friendly web utility for recording petty-cash re
 - Users can add lines, review the voucher, save, cancel, save a reusable template, or apply an existing template.
 - Applying a template fills its reusable header and line structure. Voucher date is today; party, amounts, and day-specific person choices remain for the user to enter.
 - Recent vouchers and party history are compact, collapsible read-only aids intended to prevent duplicate entry.
+- The entry screen shows Expected Cash at Hand using the latest locked closure's closing book cash plus saved receipts and minus saved expenses dated after that closure and up to today. Both signed and unsigned vouchers are included; unsaved form entries and future-dated vouchers are excluded.
+- Expected Cash at Hand refreshes when the application opens, after every successful voucher create or update, when the browser regains focus, every 60 seconds while open, and through its manual refresh controls. A refresh failure must retain the last successful figure and visibly mark it as potentially stale rather than displaying zero.
 
 ## Authentication and deployment
 

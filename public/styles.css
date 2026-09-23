@@ -165,10 +165,110 @@ p {
   padding: 10px 12px;
 }
 
+.entry-overview {
+  align-items: start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin: 0 0 14px;
+}
+
 .entry-tabs {
   display: flex;
   gap: 8px;
-  margin: 0 0 14px;
+}
+
+.cash-position-card {
+  background: #fffdfa;
+  border: 1px solid #d6cdc0;
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(14, 18, 29, 0.05);
+  min-width: 330px;
+  padding: 10px 12px;
+}
+
+.cash-position-heading {
+  align-items: center;
+  color: var(--brand-dark);
+  display: flex;
+  font-size: 12px;
+  font-weight: 800;
+  justify-content: space-between;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.cash-position-refresh {
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  font-size: 11px;
+  min-height: auto;
+  padding: 2px 0 2px 8px;
+}
+
+.cash-position-refresh:hover {
+  background: transparent;
+  color: var(--brand-dark);
+}
+
+.cash-position-amount {
+  color: var(--brand-dark);
+  font-family: "Exo", "Public Sans", sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-top: 2px;
+}
+
+.cash-position-context {
+  color: var(--info-muted);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.cash-position-details {
+  color: var(--info-muted);
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+.cash-position-details summary {
+  color: var(--accent-strong);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.cash-position-details dl {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+}
+
+.cash-position-details dl div {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.cash-position-details dt,
+.cash-position-details dd {
+  font-size: 11px;
+  margin: 0;
+}
+
+.cash-position-details dd {
+  color: var(--brand-dark);
+  font-weight: 700;
+}
+
+.cash-position-stale {
+  border-left-color: #d93025;
+}
+
+.cash-position-stale .cash-position-context {
+  color: #b3261e;
 }
 
 .tab-button {
@@ -902,6 +1002,16 @@ pre {
     align-items: start;
     gap: 12px;
     flex-direction: column;
+  }
+
+  .entry-overview {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cash-position-card {
+    min-width: 0;
+    width: 100%;
   }
 
   .header-tools {
