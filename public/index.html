@@ -36,9 +36,28 @@
 
       <form id="voucherForm" class="hidden" autocomplete="off">
         <div id="dryRunBanner" class="dry-run-banner hidden">Server dry-run mode is enabled. Saves will validate only and will not write to Grist.</div>
-        <div class="entry-tabs" role="tablist" aria-label="Voucher entry mode">
-          <button id="newVoucherTab" class="tab-button active" type="button" role="tab" aria-selected="true">New Voucher</button>
-          <button id="editVoucherTab" class="tab-button" type="button" role="tab" aria-selected="false">Edit Voucher</button>
+        <div class="entry-overview">
+          <div class="entry-tabs" role="tablist" aria-label="Voucher entry mode">
+            <button id="newVoucherTab" class="tab-button active" type="button" role="tab" aria-selected="true">New Voucher</button>
+            <button id="editVoucherTab" class="tab-button" type="button" role="tab" aria-selected="false">Edit Voucher</button>
+          </div>
+          <section id="cashPositionCard" class="cash-position-card cash-position-loading" aria-live="polite" aria-label="Expected cash at hand">
+            <div class="cash-position-heading">
+              <span>Expected Cash at Hand</span>
+              <button id="refreshCashPosition" class="cash-position-refresh" type="button" title="Refresh cash position" aria-label="Refresh cash position">Refresh</button>
+            </div>
+            <div id="cashPositionAmount" class="cash-position-amount">Loading...</div>
+            <div id="cashPositionContext" class="cash-position-context">Reading the latest locked closure and saved vouchers.</div>
+            <details class="cash-position-details">
+              <summary>View breakdown</summary>
+              <dl>
+                <div><dt>Opening from latest closure</dt><dd id="cashPositionOpening">—</dd></div>
+                <div><dt>Receipts since closure</dt><dd id="cashPositionReceipts">—</dd></div>
+                <div><dt>Expenses since closure</dt><dd id="cashPositionExpenses">—</dd></div>
+                <div><dt>Saved vouchers included</dt><dd id="cashPositionVoucherCount">—</dd></div>
+              </dl>
+            </details>
+          </section>
         </div>
 
         <section id="editSearchPanel" class="panel edit-search-panel hidden">

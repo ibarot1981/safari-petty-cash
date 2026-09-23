@@ -57,7 +57,7 @@ Before save, the application requests possible duplicates. The user can cancel a
 
 ### User aids
 
-The Recent Entries rail, party-history drawer, purpose-description suggestions, pinned/frequent sort order, and near-party warning are read-only entry aids. They must not change the financial result of a voucher.
+The Recent Entries rail, party-history drawer, purpose-description suggestions, pinned/frequent sort order, near-party warning, and Expected Cash at Hand card are read-only entry aids. They must not change the financial result of a voucher. The cash card sits beside the New/Edit controls, shows the latest locked closure as its opening amount, and adds all saved receipts and subtracts all saved expenses after that close through today, regardless of signing status. It refreshes on load, after successful voucher creates and updates, on window focus, every 60 seconds, and with manual refresh actions. Refresh failures retain the last successful value and mark it stale.
 
 ## Server: `server.mjs`
 
@@ -68,7 +68,7 @@ Key responsibilities:
 - Reads environment values from `.env` only when not already supplied by the process.
 - Implements signed session cookies with `SESSION_SECRET`.
 - Uses OIDC Authorization Code with PKCE for Authentik.
-- Exposes health, current-user, reference-data, search, party-history, duplicate-check, party-create, template, save, and update endpoints.
+- Exposes health, current-user, reference-data, cash-position, search, party-history, duplicate-check, party-create, template, save, and update endpoints.
 - Serves static files from `public/` with a restrictive path check.
 
 Any new API endpoint must remain authenticated unless it is deliberately required before login. Never send Grist credentials to the browser.
@@ -83,6 +83,7 @@ The fixed document ID is `moe5mP3wFHp6noNdS6FYh3`. `TABLES` is the central mappi
 
 - `getReferenceData` reads master tables for form choices.
 - `getRecentVouchers`, `searchVouchers`, and `getPartyVouchers` build read-only entry aids.
+- `getCashPosition` calculates current expected cash from the latest locked closure and all saved current-period vouchers through today. `calculateCashPosition` contains the independently tested calculation logic.
 - `findDuplicateVouchers` identifies possible, not certain, duplicates.
 - `getVoucherForEdit` retrieves a header with its lines and allocations, then checks whether it remains editable.
 

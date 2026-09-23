@@ -6,6 +6,7 @@ export const DOC_ID = "moe5mP3wFHp6noNdS6FYh3";
 
 const TABLES = {
   headers: "PettyCashVouchers",
+  closures: "CashClosures",
   lines: "VoucherLines",
   allocations: "LineAllocations",
   purposes: "VoucherPurposes",
@@ -121,6 +122,58 @@ function dateKey(value) {
     return new Date(value * 1000).toISOString().slice(0, 10);
   }
   return String(value).slice(0, 10);
+}
+
+function currentDateKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Calcutta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const part = (type) => parts.find((item) => item.type === type)?.value;
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
+export function calculateCashPosition(closures = [], vouchers = [], asOfDate = currentDateKey()) {
+  const lockedClosures = closures
+    .filter((closure) => closure.Locked && dateKey(closure.Close_Date) && dateKey(closure.Close_Date) <= asOfDate)
+    .sort((a, b) => dateKey(a.Close_Date).localeCompare(dateKey(b.Close_Date)) || Number(a.id || 0) - Number(b.id || 0));
+  const latestClosure = lockedClosures.at(-1);
+  const latestCloseDate = latestClosure ? dateKey(latestClosure.Close_Date) : "";
+  const currentVouchers = vouchers.filter((voucher) => {
+    const voucherDate = dateKey(voucher.Voucher_Date);
+    return voucherDate
+      && voucherDate <= asOfDate
+      && (!latestCloseDate || voucherDate > latestCloseDate)
+      && ["Expense", "Receipt"].includes(voucher.Voucher_Type);
+  });
+  const receiptCents = currentVouchers.reduce((sum, voucher) => sum + amountKey(voucher.Receipt_Amount), 0);
+  const expenseCents = currentVouchers.reduce((sum, voucher) => sum + amountKey(voucher.Total_Expense_Amt), 0);
+  const openingCents = amountKey(latestClosure?.Closing_Book_Cash);
+
+  return {
+    asOfDate,
+    latestCloseDate: latestCloseDate || null,
+    openingCash: openingCents / 100,
+    receiptTotal: receiptCents / 100,
+    expenseTotal: expenseCents / 100,
+    cashAtHand: (openingCents + receiptCents - expenseCents) / 100,
+    voucherCount: currentVouchers.length,
+    signedCount: currentVouchers.filter((voucher) => voucher.Signed).length,
+    unsignedCount: currentVouchers.filter((voucher) => !voucher.Signed).length,
+  };
+}
+
+export async function getCashPosition(asOfDate = currentDateKey()) {
+  const [closures, vouchers] = await Promise.all([
+    getRecords(TABLES.closures),
+    getRecords(TABLES.headers),
+  ]);
+  return {
+    ...calculateCashPosition(closures, vouchers, asOfDate),
+    calculatedAt: new Date().toISOString(),
+  };
 }
 
 function amountKey(value) {

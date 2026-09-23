@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "sample:web": "node scripts/save-sample-web.mjs"
+    "sample:web": "node scripts/save-sample-web.mjs",
+    "test": "node --test"
   }
 }
