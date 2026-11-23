@@ -12,6 +12,7 @@ Update this document in the same pull request whenever a code path, UI workflow,
 | `server.mjs` | Node HTTP server, static-file delivery, environment loading, Authentik OIDC flow, sessions, and protected JSON API routes. |
 | `gristClient.mjs` | Grist API adapter: reference data, searches, duplicate checks, parties, templates, voucher-number creation, validation, and transactional-style voucher writes. |
 | `scripts/save-sample-web.mjs` | Developer sample payload for exercising the save path, preferably with `DRY_RUN=true`. |
+| `test/voucher-date.test.mjs` | Node regression tests for date preference restoration, calendar-date validity, per-user isolation, edit protection, and unavailable storage. Loads browser functions in an isolated VM without starting UI or network calls. |
 | `StartServer.bat` / `StopServer.bat` | Double-click Windows server lifecycle helpers; runtime state is stored in `runtime/`. |
 | `.env.example` | Safe configuration template. The actual `.env` must remain local. |
 | `docs/INSTALL.md` | Detailed fresh-Windows-machine installation, configuration, verification, update, and troubleshooting guide. |
@@ -36,6 +37,8 @@ The live Grist document contains operational review pages alongside the web util
 ## Browser application: `public/app.js`
 
 The browser keeps transient form data in a single `state` object. It never talks directly to Grist and never receives the Grist API key.
+
+The new-voucher date is the exception to transient form state: `refreshCurrentUser` records the OIDC subject from `/api/me`, and `restoreVoucherDatePreference` restores the validated ISO calendar date from `localStorage` under `safari-petty-cash:voucher-date:<subject>`. `rememberVoucherDate` responds to date input/change only in new mode, immediately updating memory and storage. `defaultVoucherDate` supplies the remembered selection (otherwise today) on initialization, form resets, and template application. Edit-mode loading retains the saved voucher's own date and edit-mode date changes do not update the preference. Storage failures are caught so entry can continue with an in-memory preference; missing identity disables durable storage. Persistence is per browser profile and site origin, survives server restarts, and does not expire at midnight.
 
 ### Reference-data entry controls
 

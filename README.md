@@ -35,7 +35,9 @@ Keyboard shortcuts are shown in the UI:
 - `Ctrl+F6`: Use Template
 - `Ctrl+F7`: Refresh Recent Entries
 
-Templates may be saved from the current voucher structure and reused later. Template use prefills voucher type, purpose, description, location, expense heads, split methods, and line descriptions. Voucher date is always today's date when a template is applied; Paid To, amounts, and single-person line targets remain day-specific.
+The Header voucher date starts with today's date until you select a different date while creating a new voucher. That selection becomes your default for subsequent new vouchers and templates, including after saves, cancellations, page reloads, and server restarts. It stays selected on later days until you change it again. Editing an existing voucher does not change this default. The preference is stored per signed-in user in this browser for this site address; other browsers/devices or clearing site data start with today again. If browser storage is blocked, the preference lasts only while the page is open.
+
+Templates may be saved from the current voucher structure and reused later. Template use prefills voucher type, purpose, description, location, expense heads, split methods, and line descriptions. Voucher date uses your remembered new-voucher date, or today if none is remembered; Paid To, amounts, and single-person line targets remain day-specific.
 
 The entry screen also shows a read-only Recent Entries panel with the last 15 vouchers, so entry users can quickly spot possible duplicates before saving.
 
