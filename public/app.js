@@ -18,12 +18,54 @@ const state = {
   editingVoucherId: 0,
   editingVoucherNo: "",
   cashPosition: null,
+  userSub: "",
+  preferredVoucherDate: "",
 };
 
 const $ = (id) => document.getElementById(id);
 
 function today() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function isRememberableVoucherDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith("0000")) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+function voucherDateStorageKey() {
+  return state.userSub ? `safari-petty-cash:voucher-date:${state.userSub}` : "";
+}
+
+function restoreVoucherDatePreference() {
+  state.preferredVoucherDate = "";
+  const key = voucherDateStorageKey();
+  if (!key) return;
+  try {
+    const value = window.localStorage.getItem(key);
+    if (isRememberableVoucherDate(value)) state.preferredVoucherDate = value;
+  } catch {
+    // Storage may be blocked; voucher entry must still work.
+  }
+}
+
+function defaultVoucherDate() {
+  return state.preferredVoucherDate || today();
+}
+
+function rememberVoucherDate() {
+  if (state.mode !== "new") return;
+  const value = $("voucherDate").value;
+  if (!isRememberableVoucherDate(value)) return;
+  state.preferredVoucherDate = value;
+  const key = voucherDateStorageKey();
+  if (!key) return;
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Keep the preference for this page even if durable storage is unavailable.
+  }
 }
 
 function optionLabel(item, labelField, index) {
@@ -1044,7 +1086,7 @@ function closeEditedVoucher(message = "") {
 
 function resetForm({ focusFirst = true } = {}) {
   $("voucherForm").reset();
-  $("voucherDate").value = today();
+  $("voucherDate").value = defaultVoucherDate();
   setDefaultLocation();
   state.lines = [];
   state.multiPartyIds = [];
@@ -1251,7 +1293,7 @@ function applyTemplate() {
   }
 
   $("voucherType").value = template.Voucher_Type || "Expense";
-  $("voucherDate").value = today();
+  $("voucherDate").value = defaultVoucherDate();
   refreshPurposeList();
   $("voucherPurposeText").value = valueById(currentPurposeRecords(), template.Voucher_Purpose, "Purpose_Name");
   $("locationText").value = valueById(state.refs.locations, template.Location, "Location_Name");
@@ -1444,6 +1486,7 @@ async function refreshCurrentUser() {
     if (!response.ok) throw new Error("Could not load signed-in user.");
     const result = await response.json();
     const user = result.user || {};
+    state.userSub = user.sub || "";
     badge.textContent = user.name || user.email || "Signed in";
     badge.title = user.email || user.username || user.name || "";
   } catch {
@@ -1543,6 +1586,7 @@ function skipRecentEntriesInTabOrder(event) {
 
 async function init() {
   await refreshCurrentUser();
+  restoreVoucherDatePreference();
   await refreshAppConfig();
   const gristOk = await checkGristHealth({ showChecking: true });
   $("retryGristHealth").addEventListener("click", async () => {
@@ -1561,7 +1605,9 @@ async function init() {
   await refreshDashboard();
   setEntryMode("new");
 
-  $("voucherDate").value = today();
+  $("voucherDate").value = defaultVoucherDate();
+  $("voucherDate").addEventListener("input", rememberVoucherDate);
+  $("voucherDate").addEventListener("change", rememberVoucherDate);
   setDefaultLocation();
   $("voucherType").addEventListener("change", () => {
     toggleVoucherType();
